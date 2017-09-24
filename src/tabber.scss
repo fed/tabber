@@ -1,0 +1,114 @@
+.tabber {
+  .title {
+    margin-top: 0;
+  }
+
+  .tabber-group {
+    position: relative;
+    .tabber-control {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid #CCCCCC; // @color-neutral-md-light;
+
+      &::before,
+      &::after {
+        content: " ";
+        width: 40px;
+        height: 100%;
+        position: absolute;
+        top: 0;
+      }
+
+      &::before {
+        left: 0;
+        //.background-image(linear-gradient(left, rgba(255,255,255,1) 30%, rgba(255,255,255,0) 100%));
+      }
+
+      &::after {
+        right: 0;
+        //.background-image(linear-gradient(right, rgba(255,255,255,1) 30%, rgba(255,255,255,0) 100%));
+      }
+
+      &.no-fade-left::before,
+      &.no-fade-right::after {
+        display: none;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        white-space: nowrap;
+
+        li {
+          display: inline-block;
+          font-weight: bold;
+          margin: 0 -4px 0 0;
+
+          a {
+            border-bottom: 3px solid transparent;
+            display: block;
+            padding: 10px 20px; // @offset-vertical-xs @offset-horizontal-md;
+            text-decoration: none;
+
+            &:focus {
+              outline: none;
+            }
+          }
+
+          &.selected {
+            a {
+              color: #333; // @color-text;
+              border-bottom: 3px solid #056CC1; //@color-link;
+
+              &:hover {
+                cursor: default;
+              }
+            }
+          }
+        }
+      }
+
+      .left-arrow,
+      .right-arrow {
+        display: none;
+        position: absolute;
+        min-height: 100%;
+        z-index: 10000;
+        width: 14px; // @font-size-base;
+        top: 0;
+
+
+        &.edge {
+          cursor: default;
+          display: none;
+        }
+
+        &:focus {
+          outline: none;
+        }
+
+        i {
+          position: absolute;
+          top: 50%;
+          margin-top: -0.5*14px; //half of the @font-size-base
+        }
+      }
+
+      .left-arrow {
+        left: 0;
+      }
+
+      .right-arrow {
+        right: 0;
+      }
+    }
+
+    .tabber-content {
+      & > div {
+        display: none;
+        padding: 10px;
+      }
+    }
+  }
+}

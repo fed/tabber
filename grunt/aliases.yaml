@@ -1,0 +1,15 @@
+default:
+  - 'build'
+  - 'connect:server'
+  - 'watch'
+build:
+  - 'jshint'
+  - 'jsonlint'
+  - 'sass'
+  - 'csslint'
+  - 'hogan'
+test:
+  - 'build'
+  - 'connect:server'
+  - 'phantom'
+  - 'casperjs'

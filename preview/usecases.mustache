@@ -1,0 +1,13 @@
+{{#usecases}}
+  <div class="use-case">
+    <h2>{{title}}</h2>
+
+    {{#description}}
+      <p>{{&description}}</p>
+    {{/description}}
+
+    {{#data}}
+      {{>tabber}}
+    {{/data}}
+  </div>
+{{/usecases}}

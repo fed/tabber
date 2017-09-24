@@ -1,0 +1,186 @@
+[
+  {
+    "title": "Months abbreviations (same length)",
+    "data": {
+      "tabs": [
+        {
+          "id": "months-same-length_1",
+          "name": "Jan"
+        },
+        {
+          "id": "months-same-length_2",
+          "name": "Feb"
+        },
+        {
+          "id": "months-same-length_3",
+          "name": "Mar"
+        },
+        {
+          "id": "months-same-length_4",
+          "name": "Apr"
+        },
+        {
+          "id": "months-same-length_5",
+          "name": "May"
+        },
+        {
+          "id": "months-same-length_6",
+          "name": "Jun"
+        },
+        {
+          "id": "months-same-length_7",
+          "name": "Jul"
+        },
+        {
+          "id": "months-same-length_8",
+          "name": "Aug"
+        },
+        {
+          "id": "months-same-length_9",
+          "name": "Sep"
+        },
+        {
+          "id": "months-same-length_10",
+          "name": "Oct"
+        },
+        {
+          "id": "months-same-length_11",
+          "name": "Nov"
+        },
+        {
+          "id": "months-same-length_12",
+          "name": "Dec"
+        }
+      ]
+    }
+  },
+
+  {
+    "title": "Months (full length)",
+    "data": {
+      "tabs": [
+        {
+          "id": "months-full-length_1",
+          "name": "January"
+        },
+        {
+          "id": "months-full-length_2",
+          "name": "February"
+        },
+        {
+          "id": "months-full-length_3",
+          "name": "March"
+        },
+        {
+          "id": "months-full-length_4",
+          "name": "April"
+        },
+        {
+          "id": "months-full-length_5",
+          "name": "May"
+        },
+        {
+          "id": "months-full-length_6",
+          "name": "June"
+        },
+        {
+          "id": "months-full-length_7",
+          "name": "July"
+        },
+        {
+          "id": "months-full-length_8",
+          "name": "August"
+        },
+        {
+          "id": "months-full-length_9",
+          "name": "September"
+        },
+        {
+          "id": "months-full-length_10",
+          "name": "October"
+        },
+        {
+          "id": "months-full-length_11",
+          "name": "November"
+        },
+        {
+          "id": "months-full-length_12",
+          "name": "December"
+        }
+      ]
+    }
+  },
+
+  {
+    "title": "Single tab",
+    "data": {
+      "tabs" : [
+        {
+          "id": "single-tab_1",
+          "name": "I'm on my own here"
+        }
+      ]
+    }
+  },
+
+  {
+    "title": "Using font icons on tabs",
+    "data": {
+      "tabs": [
+        {
+          "id": "single-tab_1",
+          "name": "<i class='fa fa-plane'></i> Flights"
+        },
+        {
+          "id": "single-tab_2",
+          "name": "<i class='fa fa-hotel'></i> Hotels"
+        },
+        {
+          "id": "single-tab_3",
+          "name": "<i class='fa fa-gift'></i> Packages"
+        },
+        {
+          "id": "single-tab_4",
+          "name": "<i class='fa fa-car'></i> Cars"
+        }
+      ]
+    }
+  },
+
+  {
+    "title": "Random tab names",
+    "description": "With different lengths",
+    "data": {
+      "tabs": [
+        {
+          "id": "random-tabs_1",
+          "name": "Hotels"
+        },
+        {
+          "id": "random-tabs_2",
+          "name": "This is a really super duper long annoying text"
+        },
+        {
+          "id": "random-tabs_3",
+          "name": "Something else"
+        },
+        {
+          "id": "random-tabs_4",
+          "name": "<i class='i i-thumb-positive'></i>"
+        },
+        {
+          "id": "random-tabs_5",
+          "name": "Flights"
+        },
+        {
+          "id": "random-tabs_6",
+          "name": "Search for inexpensive flights to Chicago"
+        },
+        {
+          "id": "random-tabs_7",
+          "name": "One last tab"
+        }
+      ]
+    }
+  }
+]

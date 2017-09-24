@@ -1,0 +1,27 @@
+<div class="tabber container-simple">
+  <div class="tabber-group">
+    <div class="tabber-control">
+      <a href="javascript:void(0);" class="left-arrow">
+        <i class="fa fa-chevron-left"></i>
+      </a>
+      <ul>
+        {{#tabs}}
+        <li>
+          <a href="#{{id}}" class="{{id}}">{{&name}}</a>
+        </li>
+        {{/tabs}}
+      </ul>
+      <a href="javascript:void(0);" class="right-arrow">
+        <i class="fa fa-chevron-right"></i>
+      </a>
+    </div>
+
+    <div class="tabber-content">
+      {{#tabs}}
+      <div class="{{id}}">
+        {{&content}}
+      </div>
+      {{/tabs}}
+    </div>
+  </div>
+</div>
