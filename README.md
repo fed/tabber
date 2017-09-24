@@ -1,8 +1,8 @@
-# ui-component-example
+# Tabber
 
-This is a simple ui-component consisting just of a button that changes its background color randomly as it gets clicked on. This demo module was created to illustrate how ui-components work and get integrated to bigger projects.
+Scrollable navigation tabs.
 
-> Created with [generator-ui-component](https://github.com/fknussel/generator-ui-component) v0.1.0.
+> Created with [generator-ui-component](https://github.com/fknussel/generator-ui-component).
 
 ## Prerequisites
 
@@ -35,7 +35,7 @@ grunt
 
 ## Creating your module
 
-1. Edit mustache, SASS, JS files in `./src` (e.g. `./src/component.mustache`, `./src/component.scss`, and `./src/component.js`).
+1. Edit mustache, Sass and JavaScript files in `./src` (e.g. `./src/tabber.mustache`, `./src/tabber.scss`, and `./src/tabber.js`).
 2. Add mock JSON data model to `./model/usecases.json`.
 4. Build and run the app, and visit [http://localhost:4567](http://localhost:4567) in your browser.
 
