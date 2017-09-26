@@ -5,7 +5,8 @@ require.config({
     lodash: '../node_modules/lodash/index',
     hogan: '../node_modules/hogan.js/dist/hogan-3.0.2.min.amd',
     animate: '../src/animate',
-    tabber: '../src/tabber'
+    tabber: '../src/tabber',
+    template: '../dist/template'
   }
 });
 

@@ -1,6 +1,4 @@
 .sass-cache/
+dist/
 node_modules/
 npm-debug.log
-preview/template.js
-src/tabber.css
-src/tabber.css.map

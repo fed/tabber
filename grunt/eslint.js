@@ -7,7 +7,7 @@ module.exports = {
     'grunt/{,**/}*.js',
     'test/{,**/}*.js',
     'src/{,**/}*.js',
-    'preview/{,**/}*.js',
-    '!preview/template.js'
+    'styleguide/{,**/}*.js',
+    '!styleguide/template.js'
   ]
 };

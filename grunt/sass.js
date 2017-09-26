@@ -5,7 +5,7 @@ module.exports = {
   },
   dist: {
     files: {
-      'src/tabber.css': 'src/tabber.scss'
+      'dist/tabber.css': 'src/tabber.scss'
     }
   }
 };

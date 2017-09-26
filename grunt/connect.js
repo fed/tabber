@@ -4,7 +4,7 @@ module.exports = function () {
       options: {
         hostname: '*',
         port: process.env.PORT || '4567',
-        base: ['.', 'preview']
+        base: ['.', 'styleguide']
       }
     }
   };

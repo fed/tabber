@@ -11,7 +11,5 @@ module.exports = function (grunt) {
     }
   };
 
-  grunt.loadTasks('grunt/tasks');
-
   require('load-grunt-config')(grunt, options);
 };

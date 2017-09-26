@@ -1,8 +1,8 @@
 module.exports = function () {
   return {
     all: {
-      src: ['src/**/*.mustache', 'preview/**/*.mustache'],
-      dest: 'preview/template.js',
+      src: ['src/**/*.mustache', 'styleguide/**/*.mustache'],
+      dest: 'dist/template.js',
       options: {
         binderName: 'amd'
       }
