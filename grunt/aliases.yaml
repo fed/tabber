@@ -3,7 +3,7 @@ default:
   - 'connect:server'
   - 'watch'
 build:
-  - 'jshint'
+  - 'eslint'
   - 'jsonlint'
   - 'sass'
   - 'csslint'

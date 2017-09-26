@@ -1,7 +1,7 @@
 module.exports = function () {
-	return {
-		model: {
-			src: ['model/{,**/}*.json']
-		}
-	};
+  return {
+    model: {
+      src: ['model/{,**/}*.json']
+    }
+  };
 };

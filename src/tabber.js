@@ -103,7 +103,7 @@ define('tabber', ['animate'], (animate) => {
             }
           });
 
-          this.animateScrolling('right', howMuchToScroll);
+        this.animateScrolling('right', howMuchToScroll);
       }
     },
 
