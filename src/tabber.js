@@ -1,11 +1,12 @@
-define('tabber', ['animate'], (animate) => {
-  console.log(animate);
-
+define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
   const DEFAULTS = {
     arrowWidth: 14,
     tabSlideSpeed: 600,
     arrowFadeSpeed: 300
   };
+
+  // Animation effects
+  const {show, hide} = animate;
 
   function Tabber(element, options = {}) {
     // Settings
@@ -24,8 +25,10 @@ define('tabber', ['animate'], (animate) => {
     this.rightArrow.addEventListener('click', this.scrollRight.bind(this));
     this.items.forEach(() => addEventListener('click', this.selectTab.bind(this)));
 
-    Array.from(this.panels.children).forEach(panel => this.hidePanel(panel));
-    this.panels.firstElementChild.style.display = 'block';
+    Array
+      .from(this.panels.children)
+      .forEach(panel => this.hidePanel(panel));
+    this.showPanel(this.panels.firstElementChild); // fadeIn
     this.tabs.firstElementChild.classList.add('selected');
     this.updateControls();
     this.responsify();
@@ -33,8 +36,7 @@ define('tabber', ['animate'], (animate) => {
 
   Tabber.prototype = {
     responsify() {
-      // @TODO: debounce this event
-      window.addEventListener('resize', this.updateControls.bind(this));
+      window.addEventListener('resize', debounce(this.updateControls.bind(this), 300));
     },
 
     animateScrolling(direction, length) {
@@ -54,7 +56,7 @@ define('tabber', ['animate'], (animate) => {
       // @TODO
       const animation = this.tabs.animate(
         { marginLeft: margin },
-        { duration: this.settings.tabSlideSpeed, easing: 'linear' }
+        { duration: this.settings.tabSlideSpeed }
       );
 
       animation.onfinish = () => {
@@ -119,11 +121,11 @@ define('tabber', ['animate'], (animate) => {
     },
 
     isFirstTab(tab) {
-      return tab === this.items.firstChild;
+      return tab === this.items.firstElementChild;
     },
 
     isLastTab(tab) {
-      return tab === this.items.lastChild;
+      return tab === this.items.lastElementChild;
     },
 
     getDistanceToRightEdge(tab) {
@@ -146,48 +148,39 @@ define('tabber', ['animate'], (animate) => {
     },
 
     enableLeftControl() {
-      this.leftArrow.style.display = 'inline-block'; // @TODO: fadeIn(this.leftArrow);
+      show(this.leftArrow, 'inline-block'); // @TODO: fadeIn
       this.control.classList.remove('no-fade-left');
     },
 
     disableLeftControl() {
-      this.leftArrow.style.display = 'none'; // @TODO: fadeOut(this.leftArrow);
+      hide(this.leftArrow); // @TODO: fadeOut
       this.control.classList.add('no-fade-left');
     },
 
     enableRightControl() {
-      this.rightArrow.style.display = 'inline-block'; // @TODO: fadeIn(this.rightArrow);
+      show(this.rightArrow, 'inline-block'); // @TODO: fadeIn
       this.control.classList.remove('no-fade-right');
     },
 
     disableRightControl() {
-      this.rightArrow.style.display = 'none'; // @TODO: fadeOut(this.rightArrow);
+      hide(this.rightArrow); // @TODO: fadeOut
       this.control.classList.add('no-fade-right');
     },
 
     updateControls() {
-      let shouldShowLeftArrow = false;
-      let shouldShowRightArrow = false;
+      let showLeftArrow = false;
+      let showRightArrow = false;
 
       this.items.forEach(item => {
         if (this.isOffLeftEdge(item)) {
-          shouldShowLeftArrow = true;
+          showLeftArrow = true;
         } else if (this.isOffRightEdge(item)) {
-          shouldShowRightArrow = true;
+          showRightArrow = true;
         }
       });
 
-      if (shouldShowLeftArrow) {
-        this.enableLeftControl();
-      } else {
-        this.disableLeftControl();
-      }
-
-      if (shouldShowRightArrow) {
-        this.enableRightControl();
-      } else {
-        this.disableRightControl();
-      }
+      showLeftArrow ? this.enableLeftControl() : this.disableLeftControl();
+      showRightArrow ? this.enableRightControl() : this.disableRightControl();
     },
 
     selectTab(event) {
@@ -195,7 +188,7 @@ define('tabber', ['animate'], (animate) => {
 
       const tab = event.target;
       const tabId = tab.getAttribute('class'); // @TODO: i don't like this. what if there are other classes applied?
-      const alreadySelected = tabId === this.getSelectedTab().querySelector('a').getAttribute('class');
+      const alreadySelected = false; //tabId === this.getSelectedTab().querySelector('a').getAttribute('class');
 
       if (!alreadySelected) {
         this.updateContent(tabId);
@@ -214,11 +207,11 @@ define('tabber', ['animate'], (animate) => {
     },
 
     hidePanel(panel) {
-      panel.style.display = 'none'; // fadeOut(panel);
+      hide(panel); // fadeOut
     },
 
     showPanel(panel) {
-      panel.style.display = 'block'; // fadeIn(panel);
+      show(panel); // fadeIn
     },
 
     updateContent(tabId) {

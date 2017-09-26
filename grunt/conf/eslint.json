@@ -7,7 +7,8 @@
     "phantomjs": true
   },
   "globals": {
-    "requirejs": true
+    "requirejs": true,
+    "casper": true
   },
   "extends": "eslint:recommended",
   "rules": {

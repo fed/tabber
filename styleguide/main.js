@@ -1,24 +1,27 @@
 require.config({
   baseUrl: '.',
   paths: {
-    jquery: '../node_modules/jquery/dist/jquery.min',
-    lodash: '../node_modules/lodash/index',
     hogan: '../node_modules/hogan.js/dist/hogan-3.0.2.min.amd',
+    lodash: '../node_modules/lodash-amd',
     animate: '../src/animate',
     tabber: '../src/tabber',
     template: '../dist/template'
   }
 });
 
-requirejs(['jquery', 'template', 'tabber'], function ($, template, tabber) {
+requirejs(['template', 'tabber'], (template, Tabber) => {
   // Fetch use cases data
-  $.getJSON('/model/usecases.json').done(function (data) {
-    // Populate the template and load the content on the html
-    $('#use-cases-container').html(template.usecases({
-      usecases: data.usecases
-    }));
+  fetch('/model/usecases.json')
+    .then(response => response.json())
+    .then(data => {
+      // Populate the template and load the content on the html
+      const container = document.getElementById('use-cases-container');
 
-    // Initialize the agent for each of the use cases
-    document.querySelectorAll('.tabber').forEach(element => new tabber(element, {}));
-  });
+      container.innerHTML = template.usecases({
+        usecases: data.usecases
+      });
+
+      // Initialize the agent for each of the use cases
+      document.querySelectorAll('.tabber').forEach(element => new Tabber(element, {}));
+    });
 });
