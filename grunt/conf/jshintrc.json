@@ -1,12 +1,13 @@
 {
-	"debug": true,
-	"curly": true,
-	"laxbreak": true,
-	"laxcomma": true,
-	"unused": false,
-	"globals": {
-		"console": true,
-		"define": true,
-		"require": true
-	}
+  "esversion": 6,
+  "debug": true,
+  "curly": true,
+  "laxbreak": true,
+  "laxcomma": true,
+  "unused": false,
+  "globals": {
+    "console": true,
+    "define": true,
+    "require": true
+  }
 }
