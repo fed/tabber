@@ -1,11 +1,9 @@
-module.exports = function () {
-  return {
-    server: {
-      options: {
-        hostname: '*',
-        port: process.env.PORT || '4567',
-        base: ['.', 'styleguide']
-      }
+module.exports = {
+  server: {
+    options: {
+      hostname: '*',
+      port: process.env.PORT || 4567,
+      base: ['.', 'styleguide']
     }
-  };
+  }
 };
