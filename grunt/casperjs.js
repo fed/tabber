@@ -5,6 +5,6 @@ module.exports = function () {
         parallel: false
       }
     },
-    files: ['tests/{,**/}*.js']
+    files: ['test/{,**/}*.js']
   };
 };

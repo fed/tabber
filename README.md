@@ -1,6 +1,6 @@
 # Tabber
 
-Scrollable navigation tabs.
+Scrollable navigation tabs ui-component.
 
 > Created with [generator-ui-component](https://github.com/fknussel/generator-ui-component).
 
@@ -12,43 +12,53 @@ Scrollable navigation tabs.
 ## Setup
 
 ```
-npm install
+yarn install
 ```
 
 ## Run tests
 
 ```
-grunt test
+yarn test
 ```
 
 ## Build assets
 
 ```
-grunt build
+yarn build
 ```
 
 ## Build, run and watch for changes
 
 ```
-grunt
+yarn start
 ```
 
 ## Creating your module
 
 1. Edit mustache, Sass and JavaScript files in `./src` (e.g. `./src/tabber.mustache`, `./src/tabber.scss`, and `./src/tabber.js`).
-2. Add mock JSON data model to `./model/usecases.json`.
+
+## Styleguide
+
+Further use cases for the styleguide can be added to the data model file on `./model/usecases.json`.
+
 4. Build and run the app, and visit [http://localhost:4567](http://localhost:4567) in your browser.
 
-## Release versions
+## Releasing new versions
 
-This repo uses [grunt-bump](https://github.com/gruntjs/grunt-bump) and Semantic Versioning to version and tag releases. To release a new version, run the appropriate command:
+This repo uses [Semantic Versioning](http://semver.org/) and tag releases. To release a new version, run the appropriate command:
 
 ```
-grunt release:major       # bump major version, eg. 1.0.2 -> 2.0.0
-grunt release:minor       # bump minor version, eg. 0.1.3 -> 0.2.0
-grunt release:patch       # bump patch version, eg. 0.0.1 -> 0.0.2
-grunt release:prerelease  # bump pre-release version, eg. 1.0.0 -> 1.0.0-1
+npm version major       # bump major version, eg. 1.0.2 -> 2.0.0
+npm version minor       # bump minor version, eg. 0.1.3 -> 0.2.0
+npm version patch       # bump patch version, eg. 0.0.1 -> 0.0.2
+npm version prerelease  # bump pre-release version, eg. 1.0.0 -> 1.0.0-1
 ```
+
+Given a version number `MAJOR.MINOR.PATCH`, increment the:
+
+1. `MAJOR` version when you make incompatible API changes,
+2. `MINOR` version when you add functionality in a backwards-compatible manner, and
+3. `PATCH` version when you make backwards-compatible bug fixes.
 
 Make sure to push tags:
 
@@ -63,17 +73,3 @@ npm publish
 ```
 
 **Heads up!** To publish, you must have a user on the npm registry. If you don't have one, create it with `npm adduser`. If you created one on the site, use `npm login` to store the credentials on the client. You can use `npm config ls` to ensure that the credentials are stored on your client. Check that it has been added to the registry by going to [http://npmjs.com/~](http://npmjs.com/~).
-
-## Semantic versioning
-
-Given a version number `MAJOR.MINOR.PATCH`, increment the:
-
-1. `MAJOR` version when you make incompatible API changes,
-2. `MINOR` version when you add functionality in a backwards-compatible manner, and
-3. `PATCH` version when you make backwards-compatible bug fixes.
-
-See the [Semantic Versioning](http://semver.org/) specification for more information.
-
-## Release history
-
-See the [CHANGELOG](CHANGELOG.md).

@@ -1,14 +1,16 @@
 .tabber {
+
   .title {
     margin-top: 0;
   }
 
   .tabber-group {
     position: relative;
+
     .tabber-control {
       position: relative;
       overflow: hidden;
-      border-bottom: 1px solid #CCCCCC; // @color-neutral-md-light;
+      border-bottom: 1px solid #ccc; // @color-neutral-md-light;
 
       &::before,
       &::after {
@@ -21,12 +23,20 @@
 
       &::before {
         left: 0;
-        //.background-image(linear-gradient(left, rgba(255,255,255,1) 30%, rgba(255,255,255,0) 100%));
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 1) 70%,
+          rgba(255, 255, 255, 0) 100%
+        );
       }
 
       &::after {
         right: 0;
-        //.background-image(linear-gradient(right, rgba(255,255,255,1) 30%, rgba(255,255,255,0) 100%));
+        background: linear-gradient(
+          to left,
+          rgba(255, 255, 255, 1) 70%,
+          rgba(255, 255, 255, 0) 100%
+        );
       }
 
       &.no-fade-left::before,
@@ -59,7 +69,7 @@
           &.selected {
             a {
               color: #333; // @color-text;
-              border-bottom: 3px solid #056CC1; //@color-link;
+              border-bottom: 3px solid #056cc1; //@color-link;
 
               &:hover {
                 cursor: default;
@@ -91,7 +101,7 @@
         i {
           position: absolute;
           top: 50%;
-          margin-top: -0.5*14px; //half of the @font-size-base
+          margin-top: -.5*14px; //half of the @font-size-base
         }
       }
 

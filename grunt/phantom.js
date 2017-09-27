@@ -1,5 +1,3 @@
-module.exports = function () {
-  return {
-    webdriver: {}
-  };
+module.exports = {
+  webdriver: {}
 };

@@ -1,230 +1,284 @@
-define('tabber', ['jquery'], function ($) {
-  var DEFAULTS = {
+define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
+  const DEFAULTS = {
     arrowWidth: 14,
-    tabSlideSpeed: 600, // speed for tab sliding
-    arrowFadeSpeed: 300 // speed for arrow fade in and out
+    tabSlideSpeed: 250
   };
 
-  var Tabber = function ($element, options) {
-    // Settings
-    this.options = $.extend({}, DEFAULTS, options);
+  // Animation effects
+  const {show, hide} = animate;
 
-    // $electors
-    this.$control = $element.find('.tabber-control');
-    this.$tabs = this.$control.find('ul');
-    this.$items = this.$tabs.find('a');
-    this.$leftArrow = this.$control.find('.left-arrow');
-    this.$rightArrow = this.$control.find('.right-arrow');
-    this.$panels = $element.find('.tabber-content');
+  function Tabber(element, options = {}) {
+    // Settings
+    this.settings = Object.assign({}, DEFAULTS, options);
+
+    // Local state
+    this.animationInProgress = false;
+
+    // Selectors
+    this.control = element.querySelector('.tabber-control');
+    this.tabsWrapper = this.control.querySelector('ul');
+    this.tabs = this.tabsWrapper.querySelectorAll('a');
+    this.leftArrow = this.control.querySelector('.left-arrow');
+    this.rightArrow = this.control.querySelector('.right-arrow');
+    this.content = element.querySelector('.tabber-content');
 
     // Event Binding
-    this.$leftArrow.on('click', $.proxy(this.scrollLeft, this));
-    this.$rightArrow.on('click', $.proxy(this.scrollRight, this));
-    this.$items.on('click', $.proxy(this.selectTab, this));
+    this.leftArrow.addEventListener('click', this.handleClickLeftArrow.bind(this));
+    this.rightArrow.addEventListener('click', this.handleClickRightArrow.bind(this));
+    this.tabs.forEach(tab => {
+      // @TODO: event delegation
+      tab.addEventListener('click', this.selectTab.bind(this));
+    });
 
-    // Agent Initialization
-    this.$panels.children().hide().first().fadeIn();
-    this.$tabs.children().first().addClass('selected');
-    this.updateControls();
-    this.responsify();
-  };
+    // Initialise agent
+    this.init();
+  }
 
   Tabber.prototype = {
-    responsify: function () {
-      $(window).on('resize', $.proxy(this.updateControls, this));
+    /*
+     * AGENT INITIALISATION
+     */
+
+    init() {
+      Array
+        .from(this.content.children)
+        .forEach(panel => this.hidePanel(panel));
+      this.showPanel(this.content.firstElementChild); // fadeIn
+      this.tabsWrapper.firstElementChild.classList.add('selected');
+      this.updateControls();
+      this.responsify();
     },
 
-    animateScrolling: function (direction, length) {
-      this.animationInProgress = true;
-
-      var margin = parseInt(this.$tabs.css('margin-left')),
-          self = this;
-
-      switch (direction) {
-        case 'right':
-          margin += length;
-          break;
-        case 'left':
-          margin -= length;
-          break;
-      }
-
-      this.$tabs
-        .animate({ 'margin-left': margin }, this.options.tabSlideSpeed)
-        .promise()
-        .done(function () {
-          self.animationInProgress = false;
-          self.updateControls();
-        });
+    responsify() {
+      window.addEventListener('resize', debounce(this.updateControls.bind(this), 300));
     },
 
-    scrollLeft: function (event) {
-      event.preventDefault();
+    /*
+     * TAB MANAGEMENT
+     */
 
-      var self = this,
-          howMuchToScroll;
-
-      if (!this.animationInProgress) {
-        $.each($(this.$items.get().reverse()), function() {
-          var $this = $(this);
-          if (self.isOffLeftEdge($this)) {
-            howMuchToScroll = self.getDistanceToLeftEdge($this);
-            if (self.isFirstTab($this)) {
-              self.disableLeftControl();
-            }
-            return false;
-          }
-        });
-
-        this.animateScrolling('left', howMuchToScroll);
-      }
+    getSelectedTab() {
+      return this.tabsWrapper.querySelector('li.selected');
     },
 
-    scrollRight: function (event) {
-      event.preventDefault();
+    updateControls() {
+      let showLeftArrow = false;
+      let showRightArrow = false;
 
-      var self = this,
-          howMuchToScroll;
-
-      if (!this.animationInProgress) {
-        $.each(this.$items, function () {
-          var $this = $(this);
-          if (self.isOffRightEdge($this)) {
-            howMuchToScroll = self.getDistanceToRightEdge($this);
-            if (self.isLastTab($this)) {
-              self.disableRightControl();
-            }
-            return false;
-          }
-        });
-        this.animateScrolling('right', howMuchToScroll);
-      }
-    },
-
-    isOffLeftEdge: function ($tab) {
-      return $tab.position().left < 0;
-    },
-
-    isOffRightEdge: function ($tab) {
-      var tabRightEdge = $tab.position().left + $tab.outerWidth(),
-          containerRightEdge = this.$control.position().left + this.$control.outerWidth();
-      return tabRightEdge > containerRightEdge;
-    },
-
-    isFirstTab: function ($tab) {
-      return $tab.is(this.$items.first());
-    },
-
-    isLastTab: function ($tab) {
-      return $tab.is(this.$items.last());
-    },
-
-    getDistanceToRightEdge: function ($tab) {
-      var tabRightEdge = $tab.position().left + $tab.outerWidth(),
-        containerRightEdge = this.$control.outerWidth();
-
-      if (this.isOffRightEdge($tab) && !this.isLastTab($tab)) {
-        return parseInt(containerRightEdge - tabRightEdge - this.options.arrowWidth);
-      } else {
-        return parseInt(containerRightEdge - tabRightEdge);
-      }
-    },
-
-    getDistanceToLeftEdge: function ($tab) {
-      if (this.isOffLeftEdge($tab) && !this.isFirstTab($tab)) {
-        return parseInt($tab.position().left - this.options.arrowWidth);
-      } else {
-        return $tab.position().left;
-      }
-    },
-
-    enableLeftControl: function () {
-      this.$leftArrow.fadeIn(this.options.arrowFadeSpeed);
-      this.$control.removeClass('no-fade-left');
-    },
-
-    disableLeftControl: function () {
-      this.$leftArrow.fadeOut(this.options.arrowFadeSpeed);
-      this.$control.addClass('no-fade-left');
-    },
-
-    enableRightControl: function () {
-      this.$rightArrow.fadeIn(this.options.arrowFadeSpeed);
-      this.$control.removeClass('no-fade-right');
-    },
-
-    disableRightControl: function () {
-      this.$rightArrow.fadeOut(this.options.arrowFadeSpeed);
-      this.$control.addClass('no-fade-right');
-    },
-
-    updateControls: function() {
-      var shouldShowLeftArrow = false,
-          shouldShowRightArrow = false,
-          self = this;
-
-      $.each(this.$items, function() {
-        var $this = $(this);
-
-        if (self.isOffLeftEdge($this)) {
-          shouldShowLeftArrow = true;
-        } else if (self.isOffRightEdge($this)) {
-          shouldShowRightArrow = true;
+      this.tabs.forEach(item => {
+        if (this.isOffLeftEdge(item)) {
+          showLeftArrow = true;
+        } else if (this.isOffRightEdge(item)) {
+          showRightArrow = true;
         }
       });
 
-      if (shouldShowLeftArrow) {
-        self.enableLeftControl();
-      } else {
-        self.disableLeftControl();
-      }
+      showLeftArrow ? this.enableLeftControl() : this.disableLeftControl();
+      showRightArrow ? this.enableRightControl() : this.disableRightControl();
+    },
 
-      if (shouldShowRightArrow) {
-        self.enableRightControl();
+    isOffLeftEdge(tab) {
+      return tab.offsetLeft < 0;
+    },
+
+    isOffRightEdge(tab) {
+      const tabRightEdge = tab.offsetLeft + tab.offsetWidth;
+      const containerRightEdge = this.control.offsetLeft + this.control.offsetWidth;
+
+      return tabRightEdge > containerRightEdge;
+    },
+
+    isFirstTab(tab) {
+      return tab === this.tabsWrapper.firstElementChild;
+    },
+
+    isLastTab(tab) {
+      return tab === this.tabsWrapper.lastElementChild;
+    },
+
+    getDistanceToRightEdge(tab) {
+      const tabRightEdge = tab.offsetLeft + tab.offsetWidth;
+      const containerRightEdge = this.control.offsetWidth;
+
+      if (this.isOffRightEdge(tab) && !this.isLastTab(tab)) {
+        return Number.parseInt(containerRightEdge - tabRightEdge - this.settings.arrowWidth);
       } else {
-        self.disableRightControl();
+        return Number.parseInt(containerRightEdge - tabRightEdge);
       }
     },
 
-    selectTab: function (event) {
+    getDistanceToLeftEdge(tab) {
+      if (this.isOffLeftEdge(tab) && !this.isFirstTab(tab)) {
+        return Number.parseInt(tab.offsetLeft - this.settings.arrowWidth);
+      } else {
+        return tab.offsetLeft;
+      }
+    },
+
+    scrollLeftTo(tab) {
+      if (this.animationInProgress) {
+        return;
+      }
+
+      const howMuchToScroll = this.getDistanceToLeftEdge(tab);
+
+      if (this.isFirstTab(tab)) {
+        this.disableLeftControl();
+      }
+
+      this.animateScrolling('left', howMuchToScroll);
+    },
+
+    // @TODO: practically the same as scrollRight, probably reuse some code
+    scrollRightTo(tab) {
+      if (this.animationInProgress) {
+        return;
+      }
+
+      const howMuchToScroll = this.getDistanceToRightEdge(tab);
+
+      if (this.isLastTab(tab)) {
+        this.disableRightControl();
+      }
+
+      this.animateScrolling('right', howMuchToScroll);
+    },
+
+    /*
+     * CONTENT PANEL MANAGEMENT
+     */
+
+    hidePanel(panel) {
+      hide(panel); // fadeOut
+    },
+
+    showPanel(panel) {
+      show(panel); // fadeIn
+    },
+
+    updateContent(tabId) {
+      const targetPanel = this.content.querySelector(`[data-content-id="${tabId}"]`);
+
+      // @TODO: probably don't hide all panels, only the hidden ones
+      Array.from(this.content.children).forEach(panel => this.hidePanel(panel));
+      this.showPanel(targetPanel);
+    },
+
+    /*
+     * ARROWS
+     */
+
+    enableLeftControl() {
+      show(this.leftArrow, 'inline-block'); // @TODO: fadeIn
+      this.control.classList.remove('no-fade-left');
+    },
+
+    disableLeftControl() {
+      hide(this.leftArrow); // @TODO: fadeOut
+      this.control.classList.add('no-fade-left');
+    },
+
+    enableRightControl() {
+      show(this.rightArrow, 'inline-block'); // @TODO: fadeIn
+      this.control.classList.remove('no-fade-right');
+    },
+
+    disableRightControl() {
+      hide(this.rightArrow); // @TODO: fadeOut
+      this.control.classList.add('no-fade-right');
+    },
+
+    handleClickLeftArrow(event) {
       event.preventDefault();
+      event.stopPropagation();
 
-      var $tab = $(event.currentTarget),
-          tabId = $(event.currentTarget).attr('class'),
-          alreadySelected = tabId === this.getSelectedTab().find('a').attr('class');
+      const tabsOffLeftEdge = Array
+        .from(this.tabs)
+        .reverse()
+        .filter(item => this.isOffLeftEdge(item));
+      const firstTabOffLeftEdge = tabsOffLeftEdge[0];
 
-      if (!alreadySelected) {
-        this.updateContent(tabId);
+      this.scrollLeftTo(firstTabOffLeftEdge);
+    },
 
-        // Bring partially visible tabs into screen when clicked
-        if (this.isOffLeftEdge($tab)) {
-          this.scrollLeft(event);
-        } else if (this.isOffRightEdge($tab)) {
-          this.scrollRight(event);
-        }
+    handleClickRightArrow(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const tabsOffRightEdge = Array
+        .from(this.tabs)
+        .filter(item => this.isOffRightEdge(item));
+      const firstTabOffRightEdge = tabsOffRightEdge[0];
+
+      this.scrollRightTo(firstTabOffRightEdge);
+    },
+
+    /*
+     * TAB CLICKING AND CONTENT MANAGEMENT
+     */
+
+    selectTab(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const tab = event.target;
+      const tabId = tab.dataset.tabId;
+      const alreadySelected = tabId === this.getSelectedTab().firstElementChild.dataset.tabId;
+
+      if (alreadySelected) {
+        return;
+      }
+
+      this.getSelectedTab().classList.remove('selected');
+      tab.parentNode.classList.add('selected');
+      this.updateContent(tabId);
+
+      // Bring partially visible tabs into screen when clicked
+      if (this.isOffLeftEdge(tab)) {
+        this.scrollLeftTo(tab);
+      } else if (this.isOffRightEdge(tab)) {
+        this.scrollRightTo(tab);
       }
     },
 
-    getSelectedTab: function () {
-      return this.$tabs.find('li.selected');
-    },
+    /*
+     * SCROLLING
+     */
 
-    hidePanel: function ($panel) {
-      $panel.hide();
-    },
+    animateScrolling(direction, length) {
+      this.animationInProgress = true;
 
-    showPanel: function ($panel) {
-      $panel.fadeIn();
-    },
+      const currentMargin = Number.parseInt(getComputedStyle(this.tabsWrapper)['margin-left']);
+      let nextMargin;
 
-    updateContent: function (tabId) {
-      var $clicked =  this.$tabs.find('a.' + tabId),
-          $targetPanel = this.$panels.children('div.' + tabId);
+      switch (direction) {
+        case 'right':
+          nextMargin = currentMargin + length;
+          break;
+        case 'left':
+          nextMargin = currentMargin - length;
+          break;
+      }
 
-      this.getSelectedTab().removeClass('selected');
-      $clicked.parent().addClass('selected');
-      this.hidePanel(this.$panels.children(':visible'));
-      this.showPanel($targetPanel);
+      const keyframes = [
+        { marginLeft: `${currentMargin}px` }, // 0%
+        { marginLeft: `${nextMargin}px` } // 100%
+      ];
+      const options = {
+        duration: this.settings.tabSlideSpeed
+      };
+      const animation = this.tabsWrapper.animate(keyframes, options);
+
+      animation.onfinish = () => {
+        this.animationInProgress = false;
+
+        // @TODO: don't wanna need to do this
+        // but marginLeft is going back to its original state once
+        // the animation is over. Not sure why though.
+        this.tabsWrapper.style.marginLeft = `${nextMargin}px`;
+
+        this.updateControls();
+      };
     }
   };
 

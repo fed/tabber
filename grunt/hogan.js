@@ -1,11 +1,9 @@
-module.exports = function () {
-  return {
-    all: {
-      src: ['src/**/*.mustache', 'preview/**/*.mustache'],
-      dest: 'preview/template.js',
-      options: {
-        binderName: 'amd'
-      }
+module.exports = {
+  all: {
+    src: ['src/**/*.mustache', 'styleguide/**/*.mustache'],
+    dest: 'dist/template.js',
+    options: {
+      binderName: 'amd'
     }
-  };
+  }
 };
