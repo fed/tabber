@@ -219,17 +219,34 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       const tabId = tab.dataset.tabId;
       const alreadySelected = tabId === this.getSelectedTab().firstElementChild.dataset.tabId;
 
-      if (!alreadySelected) {
-        this.getSelectedTab().classList.remove('selected');
-        tab.parentNode.classList.add('selected');
-        this.updateContent(tabId);
+      if (alreadySelected) {
+        return;
+      }
 
-        // Bring partially visible tabs into screen when clicked
-        if (this.isOffLeftEdge(tab)) {
-          this.scrollLeft(event); // @TODO: refactor so that i don't need to pass in an event
-        } else if (this.isOffRightEdge(tab)) {
-          this.scrollRight(event);
+      this.getSelectedTab().classList.remove('selected');
+      tab.parentNode.classList.add('selected');
+      this.updateContent(tabId);
+
+      // Bring partially visible tabs into screen when clicked
+      if (this.isOffLeftEdge(tab)) {
+        // @TODO: refactor so that i don't need to pass in an event
+        // this.scrollLeft(event);
+        const howMuchToScroll = this.getDistanceToLeftEdge(tab);
+
+        if (this.isFirstTab(tab)) {
+          this.disableLeftControl();
         }
+
+        this.animateScrolling('left', howMuchToScroll);
+      } else if (this.isOffRightEdge(tab)) {
+        // this.scrollRight(event);
+        const howMuchToScroll = this.getDistanceToRightEdge(tab);
+
+        if (this.isLastTab(tab)) {
+          this.disableRightControl();
+        }
+
+        this.animateScrolling('right', howMuchToScroll);
       }
     },
 
