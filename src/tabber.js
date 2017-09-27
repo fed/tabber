@@ -23,8 +23,8 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
     this.content = element.querySelector('.tabber-content');
 
     // Event Binding
-    this.leftArrow.addEventListener('click', this.scrollLeft.bind(this));
-    this.rightArrow.addEventListener('click', this.scrollRight.bind(this));
+    this.leftArrow.addEventListener('click', this.handleClickLeftArrow.bind(this));
+    this.rightArrow.addEventListener('click', this.handleClickRightArrow.bind(this));
     this.tabs.forEach(() => {
       addEventListener('click', this.selectTab.bind(this));
     });
@@ -34,6 +34,10 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
   }
 
   Tabber.prototype = {
+    /*
+     * AGENT INITIALISATION
+     */
+
     init() {
       Array
         .from(this.content.children)
@@ -48,82 +52,28 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       window.addEventListener('resize', debounce(this.updateControls.bind(this), 300));
     },
 
-    animateScrolling(direction, length) {
-      this.animationInProgress = true;
+    /*
+     * TAB MANAGEMENT
+     */
 
-      const currentMargin = Number.parseInt(getComputedStyle(this.tabsWrapper)['margin-left']);
-      let nextMargin;
-
-      switch (direction) {
-        case 'right':
-          nextMargin = currentMargin + length;
-          break;
-        case 'left':
-          nextMargin = currentMargin - length;
-          break;
-      }
-
-      const keyframes = [
-        { marginLeft: `${currentMargin}px` }, // 0%
-        { marginLeft: `${nextMargin}px` } // 100%
-      ];
-      const options = {
-        duration: this.settings.tabSlideSpeed
-      };
-      const animation = this.tabsWrapper.animate(keyframes, options);
-
-      animation.onfinish = () => {
-        this.animationInProgress = false;
-
-        // @TODO: don't wanna need to do this
-        // but marginLeft is going back to its original state once
-        // the animation is over. Not sure why though.
-        this.tabsWrapper.style.marginLeft = `${nextMargin}px`;
-
-        this.updateControls();
-      };
+    getSelectedTab() {
+      return this.tabsWrapper.querySelector('li.selected');
     },
 
-    scrollLeft(event) {
-      event.preventDefault();
-      event.stopPropagation();
+    updateControls() {
+      let showLeftArrow = false;
+      let showRightArrow = false;
 
-      if (this.animationInProgress) {
-        return;
-      }
-
-      const tabsOffLeftEdge = Array
-        .from(this.tabs)
-        .reverse()
-        .filter(item => this.isOffLeftEdge(item));
-      const item = tabsOffLeftEdge[0];
-      const howMuchToScroll = this.getDistanceToLeftEdge(item);
-
-      if (this.isFirstTab(item)) {
-        this.disableLeftControl();
-      }
-
-      this.animateScrolling('left', howMuchToScroll);
-    },
-
-    // @TODO: practically the same as scrollRight, probably reuse some code
-    scrollRight(event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (!this.animationInProgress) {
-        const tabsOffRightEdge = Array
-          .from(this.tabs)
-          .filter(item => this.isOffRightEdge(item));
-        const item = tabsOffRightEdge[0];
-        const howMuchToScroll = this.getDistanceToRightEdge(item);
-
-        if (this.isLastTab(item)) {
-          this.disableRightControl();
+      this.tabs.forEach(item => {
+        if (this.isOffLeftEdge(item)) {
+          showLeftArrow = true;
+        } else if (this.isOffRightEdge(item)) {
+          showRightArrow = true;
         }
+      });
 
-        this.animateScrolling('right', howMuchToScroll);
-      }
+      showLeftArrow ? this.enableLeftControl() : this.disableLeftControl();
+      showRightArrow ? this.enableRightControl() : this.disableRightControl();
     },
 
     isOffLeftEdge(tab) {
@@ -164,6 +114,59 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       }
     },
 
+    scrollLeftTo(tab) {
+      if (this.animationInProgress) {
+        return;
+      }
+
+      const howMuchToScroll = this.getDistanceToLeftEdge(tab);
+
+      if (this.isFirstTab(tab)) {
+        this.disableLeftControl();
+      }
+
+      this.animateScrolling('left', howMuchToScroll);
+    },
+
+    // @TODO: practically the same as scrollRight, probably reuse some code
+    scrollRightTo(tab) {
+      if (this.animationInProgress) {
+        return;
+      }
+
+      const howMuchToScroll = this.getDistanceToRightEdge(tab);
+
+      if (this.isLastTab(tab)) {
+        this.disableRightControl();
+      }
+
+      this.animateScrolling('right', howMuchToScroll);
+    },
+
+    /*
+     * CONTENT PANEL MANAGEMENT
+     */
+
+    hidePanel(panel) {
+      hide(panel); // fadeOut
+    },
+
+    showPanel(panel) {
+      show(panel); // fadeIn
+    },
+
+    updateContent(tabId) {
+      const targetPanel = this.content.querySelector(`[data-content-id="${tabId}"]`);
+
+      // @TODO: probably don't hide all panels, only the hidden ones
+      Array.from(this.content.children).forEach(panel => this.hidePanel(panel));
+      this.showPanel(targetPanel);
+    },
+
+    /*
+     * ARROWS
+     */
+
     enableLeftControl() {
       show(this.leftArrow, 'inline-block'); // @TODO: fadeIn
       this.control.classList.remove('no-fade-left');
@@ -184,36 +187,44 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       this.control.classList.add('no-fade-right');
     },
 
-    updateControls() {
-      let showLeftArrow = false;
-      let showRightArrow = false;
+    handleClickLeftArrow(event) {
+      event.preventDefault();
+      event.stopPropagation();
 
-      this.tabs.forEach(item => {
-        if (this.isOffLeftEdge(item)) {
-          showLeftArrow = true;
-        } else if (this.isOffRightEdge(item)) {
-          showRightArrow = true;
-        }
-      });
+      const tabsOffLeftEdge = Array
+        .from(this.tabs)
+        .reverse()
+        .filter(item => this.isOffLeftEdge(item));
+      const firstTabOffLeftEdge = tabsOffLeftEdge[0];
 
-      showLeftArrow ? this.enableLeftControl() : this.disableLeftControl();
-      showRightArrow ? this.enableRightControl() : this.disableRightControl();
+      this.scrollLeftTo(firstTabOffLeftEdge);
     },
 
-    getSelectedTab() {
-      return this.tabsWrapper.querySelector('li.selected');
+    handleClickRightArrow(event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const tabsOffRightEdge = Array
+        .from(this.tabs)
+        .filter(item => this.isOffRightEdge(item));
+      const firstTabOffRightEdge = tabsOffRightEdge[0];
+
+      this.scrollRightTo(firstTabOffRightEdge);
     },
 
-    hidePanel(panel) {
-      hide(panel); // fadeOut
-    },
-
-    showPanel(panel) {
-      show(panel); // fadeIn
-    },
+     /*
+     * TAB CLICKING AND CONTENT MANAGEMENT
+     */
 
     selectTab(event) {
       event.preventDefault();
+      event.stopPropagation();
+
+      console.log(event.target);
+
+      // if (!event.target.matches('.tabber-control ul li a')) {
+      //   return;
+      // }
 
       const tab = event.target;
       const tabId = tab.dataset.tabId;
@@ -229,33 +240,50 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
 
       // Bring partially visible tabs into screen when clicked
       if (this.isOffLeftEdge(tab)) {
-        // @TODO: refactor so that i don't need to pass in an event
-        // this.scrollLeft(event);
-        const howMuchToScroll = this.getDistanceToLeftEdge(tab);
-
-        if (this.isFirstTab(tab)) {
-          this.disableLeftControl();
-        }
-
-        this.animateScrolling('left', howMuchToScroll);
+        this.scrollLeftTo(tab);
       } else if (this.isOffRightEdge(tab)) {
-        // this.scrollRight(event);
-        const howMuchToScroll = this.getDistanceToRightEdge(tab);
-
-        if (this.isLastTab(tab)) {
-          this.disableRightControl();
-        }
-
-        this.animateScrolling('right', howMuchToScroll);
+        this.scrollRightTo(tab);
       }
     },
 
-    updateContent(tabId) {
-      const targetPanel = this.content.querySelector(`[data-content-id="${tabId}"]`);
+    /*
+     * SCROLLING
+     */
 
-      // @TODO: probably don't hide all panels, only the hidden ones
-      Array.from(this.content.children).forEach(panel => this.hidePanel(panel));
-      this.showPanel(targetPanel);
+    animateScrolling(direction, length) {
+      this.animationInProgress = true;
+
+      const currentMargin = Number.parseInt(getComputedStyle(this.tabsWrapper)['margin-left']);
+      let nextMargin;
+
+      switch (direction) {
+        case 'right':
+          nextMargin = currentMargin + length;
+          break;
+        case 'left':
+          nextMargin = currentMargin - length;
+          break;
+      }
+
+      const keyframes = [
+        { marginLeft: `${currentMargin}px` }, // 0%
+        { marginLeft: `${nextMargin}px` } // 100%
+      ];
+      const options = {
+        duration: this.settings.tabSlideSpeed
+      };
+      const animation = this.tabsWrapper.animate(keyframes, options);
+
+      animation.onfinish = () => {
+        this.animationInProgress = false;
+
+        // @TODO: don't wanna need to do this
+        // but marginLeft is going back to its original state once
+        // the animation is over. Not sure why though.
+        this.tabsWrapper.style.marginLeft = `${nextMargin}px`;
+
+        this.updateControls();
+      };
     }
   };
 
