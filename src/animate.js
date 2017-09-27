@@ -1,6 +1,6 @@
 define('animate', () => {
-  function show(element) {
-    element.style.display = 'block';
+  function show(element, display) {
+    element.style.display = display || 'block';
   }
 
   function hide(element) {

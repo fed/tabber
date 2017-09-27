@@ -7,7 +7,7 @@
       <ul>
         {{#tabs}}
         <li>
-          <a href="#{{id}}" class="{{id}}">{{&name}}</a>
+          <a href="#{{id}}" data-tab-id="{{id}}">{{&name}}</a>
         </li>
         {{/tabs}}
       </ul>
@@ -18,7 +18,7 @@
 
     <div class="tabber-content">
       {{#tabs}}
-      <div class="{{id}}">
+      <div data-content-id="{{id}}">
         {{&content}}
       </div>
       {{/tabs}}
