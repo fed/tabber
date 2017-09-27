@@ -25,8 +25,9 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
     // Event Binding
     this.leftArrow.addEventListener('click', this.handleClickLeftArrow.bind(this));
     this.rightArrow.addEventListener('click', this.handleClickRightArrow.bind(this));
-    this.tabs.forEach(() => {
-      addEventListener('click', this.selectTab.bind(this));
+    this.tabs.forEach(tab => {
+      // @TODO: event delegation
+      tab.addEventListener('click', this.selectTab.bind(this));
     });
 
     // Initialise agent
@@ -212,19 +213,13 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       this.scrollRightTo(firstTabOffRightEdge);
     },
 
-     /*
+    /*
      * TAB CLICKING AND CONTENT MANAGEMENT
      */
 
     selectTab(event) {
       event.preventDefault();
       event.stopPropagation();
-
-      console.log(event.target);
-
-      // if (!event.target.matches('.tabber-control ul li a')) {
-      //   return;
-      // }
 
       const tab = event.target;
       const tabId = tab.dataset.tabId;
