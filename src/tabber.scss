@@ -62,6 +62,8 @@
             text-decoration: none;
 
             &:focus {
+              color: #333; // @color-text;
+              border-bottom: 3px solid #056cc1; //@color-link;
               outline: none;
             }
           }
