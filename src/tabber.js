@@ -43,11 +43,15 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       Array
         .from(this.content.children)
         .forEach(panel => this.hidePanel(panel));
-      this.showPanel(this.content.firstElementChild); // fadeIn
+      this.showPanel(this.content.firstElementChild);
       this.tabsWrapper.firstElementChild.classList.add('selected');
       this.updateControls();
       this.responsify();
     },
+
+    /*
+     * REDRAW NAVBAR ON WINDOW RESIZE OR DEVICE ROTATION
+     */
 
     responsify() {
       window.addEventListener('resize', debounce(this.updateControls.bind(this), 300));
@@ -115,33 +119,28 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       }
     },
 
-    scrollLeftTo(tab) {
+    scrollToTab(tab, direction) {
       if (this.animationInProgress) {
         return;
       }
 
-      const howMuchToScroll = this.getDistanceToLeftEdge(tab);
+      let howMuchToScroll = 0;
 
-      if (this.isFirstTab(tab)) {
-        this.disableLeftControl();
+      if (direction === 'left') {
+        howMuchToScroll = this.getDistanceToLeftEdge(tab);
+
+        if (this.isFirstTab(tab)) {
+          this.disableLeftControl();
+        }
+      } else if (direction === 'right') {
+        howMuchToScroll = this.getDistanceToRightEdge(tab);
+
+        if (this.isLastTab(tab)) {
+          this.disableRightControl();
+        }
       }
 
-      this.animateScrolling('left', howMuchToScroll);
-    },
-
-    // @TODO: practically the same as scrollRight, probably reuse some code
-    scrollRightTo(tab) {
-      if (this.animationInProgress) {
-        return;
-      }
-
-      const howMuchToScroll = this.getDistanceToRightEdge(tab);
-
-      if (this.isLastTab(tab)) {
-        this.disableRightControl();
-      }
-
-      this.animateScrolling('right', howMuchToScroll);
+      this.animateScrolling(direction, howMuchToScroll);
     },
 
     /*
@@ -169,22 +168,22 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
      */
 
     enableLeftControl() {
-      show(this.leftArrow, 'inline-block'); // @TODO: fadeIn
+      show(this.leftArrow, 'inline-block');
       this.control.classList.remove('no-fade-left');
     },
 
     disableLeftControl() {
-      hide(this.leftArrow); // @TODO: fadeOut
+      hide(this.leftArrow);
       this.control.classList.add('no-fade-left');
     },
 
     enableRightControl() {
-      show(this.rightArrow, 'inline-block'); // @TODO: fadeIn
+      show(this.rightArrow, 'inline-block');
       this.control.classList.remove('no-fade-right');
     },
 
     disableRightControl() {
-      hide(this.rightArrow); // @TODO: fadeOut
+      hide(this.rightArrow);
       this.control.classList.add('no-fade-right');
     },
 
@@ -198,7 +197,7 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
         .filter(item => this.isOffLeftEdge(item));
       const firstTabOffLeftEdge = tabsOffLeftEdge[0];
 
-      this.scrollLeftTo(firstTabOffLeftEdge);
+      this.scrollToTab(firstTabOffLeftEdge, 'left');
     },
 
     handleClickRightArrow(event) {
@@ -210,7 +209,7 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
         .filter(item => this.isOffRightEdge(item));
       const firstTabOffRightEdge = tabsOffRightEdge[0];
 
-      this.scrollRightTo(firstTabOffRightEdge);
+      this.scrollToTab(firstTabOffRightEdge, 'right');
     },
 
     /*
@@ -235,9 +234,9 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
 
       // Bring partially visible tabs into screen when clicked
       if (this.isOffLeftEdge(tab)) {
-        this.scrollLeftTo(tab);
+        this.scrollToTab(tab, 'left');
       } else if (this.isOffRightEdge(tab)) {
-        this.scrollRightTo(tab);
+        this.scrollToTab(tab, 'right');
       }
     },
 
