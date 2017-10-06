@@ -1,27 +1,28 @@
-<div class="tabber container-simple">
-  <div class="tabber-group">
-    <div class="tabber-control">
-      <a href="#" class="left-arrow">
-        <i class="fa fa-chevron-left"></i>
-      </a>
-      <ul>
-        {{#tabs}}
-        <li>
-          <a href="#" data-tab-id="{{id}}">{{&name}}</a>
-        </li>
-        {{/tabs}}
-      </ul>
-      <a href="#" class="right-arrow">
-        <i class="fa fa-chevron-right"></i>
-      </a>
-    </div>
+<div data-tabber>
+  <nav class="tabber">
+    {{! @TODO: this should be added programatically }}
+    <a href="#" class="tabber__arrow tabber__arrow--left">
+      <i class="fa fa-chevron-left"></i>
+    </a>
 
-    <div class="tabber-content">
+    <ul>
       {{#tabs}}
-      <div data-content-id="{{id}}">
-        {{&content}}
-      </div>
+        <li>
+          <a class="tabber__link" href="#" data-tabber-tab="{{id}}">{{&name}}</a>
+        </li>
       {{/tabs}}
+    </ul>
+
+    {{! @TODO: this should be added programatically }}
+    <a href="#" class="tabber__arrow tabber__arrow--right">
+      <i class="fa fa-chevron-right"></i>
+    </a>
+  </nav>
+
+  {{! Content Panels }}
+  {{#tabs}}
+    <div class="content-panel" data-tabber-content="{{id}}">
+      {{&content}}
     </div>
-  </div>
+  {{/tabs}}
 </div>

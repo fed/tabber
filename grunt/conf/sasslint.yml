@@ -34,7 +34,9 @@ rules:
   indentation:
     - 2
     - size: 2
-  leading-zero: 2
+  leading-zero:
+    - 2
+    - include: true
   max-file-line-count: 0
   max-line-length: 0 # unfortunately no way to ignore comments :(
   mixin-name-format:

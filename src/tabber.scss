@@ -1,126 +1,105 @@
-.tabber {
+$font-size-base: 14px;
+$color-neutral: #ccc;
+$color-text: #333;
+$color-link: #056cc1;
 
-  .title {
-    margin-top: 0;
+.tabber {
+  border-bottom: 1px solid $color-neutral;
+  overflow: hidden;
+  position: relative;
+
+  // White-to-transparent gradient to visually give the idea
+  // that there are further elements hidden to the left/right.
+  // The left/right arrows are placed on top of these gradients.
+  &::before,
+  &::after {
+    content: " ";
+    height: 100%;
+    position: absolute;
+    top: 0;
+    width: 30px;
   }
 
-  .tabber-group {
-    position: relative;
+  &::before {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 1) 75%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    left: 0;
+  }
 
-    .tabber-control {
-      position: relative;
-      overflow: hidden;
-      border-bottom: 1px solid #ccc; // @color-neutral-md-light;
+  &::after {
+    background: linear-gradient(
+      to left,
+      rgba(255, 255, 255, 1) 70%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    right: 0;
+  }
 
-      &::before,
-      &::after {
-        content: " ";
-        width: 40px;
-        height: 100%;
-        position: absolute;
-        top: 0;
-      }
+  // When the first/last elements are visible,
+  // hide the arrows and remove the gradients from the sides.
+  &--no-fade-left::before,
+  &--no-fade-right::after {
+    display: none;
+  }
 
-      &::before {
-        left: 0;
-        background: linear-gradient(
-          to right,
-          rgba(255, 255, 255, 1) 70%,
-          rgba(255, 255, 255, 0) 100%
-        );
-      }
+  // Tabs wrapper. This corresponds to the `ul` tag on the markup.
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding-left: 0;
+    white-space: nowrap;
+  }
 
-      &::after {
-        right: 0;
-        background: linear-gradient(
-          to left,
-          rgba(255, 255, 255, 1) 70%,
-          rgba(255, 255, 255, 0) 100%
-        );
-      }
+  // Individual tabs. Corresponds to each of the `li` tags.
+  li {
+    display: inline-block;
+  }
 
-      &.no-fade-left::before,
-      &.no-fade-right::after {
-        display: none;
-      }
+  // According to the markup, each list item (`li`) contains an anchor tag (`a`)
+  // which makes the list accessible by keyboard.
+  // This is the styling for the anchor tag within each list item.
+  &__link {
+    border-bottom: 3px solid transparent;
+    display: block;
+    font-weight: bold;
+    margin: 0 -4px 0 0;
+    padding: 10px 20px;
+    text-decoration: none;
 
-      ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-        white-space: nowrap;
+    // Selected tabs and active links share the same styling.
+    &--selected,
+    &:focus {
+      color: $color-text;
+      cursor: default;
+      border-bottom-color: $color-link;
+      outline: none;
+    }
+  }
 
-        li {
-          display: inline-block;
-          font-weight: bold;
-          margin: 0 -4px 0 0;
+  // Arrows to the left and right of the navigation bar.
+  &__arrow {
+    display: none;
+    min-height: 100%;
+    position: absolute;
+    top: 0;
+    width: $font-size-base;
+    z-index: 10000;
 
-          a {
-            border-bottom: 3px solid transparent;
-            display: block;
-            padding: 10px 20px; // @offset-vertical-xs @offset-horizontal-md;
-            text-decoration: none;
-
-            &:focus {
-              color: #333; // @color-text;
-              border-bottom: 3px solid #056cc1; //@color-link;
-              outline: none;
-            }
-          }
-
-          &.selected {
-            a {
-              color: #333; // @color-text;
-              border-bottom: 3px solid #056cc1; //@color-link;
-
-              &:hover {
-                cursor: default;
-              }
-            }
-          }
-        }
-      }
-
-      .left-arrow,
-      .right-arrow {
-        display: none;
-        position: absolute;
-        min-height: 100%;
-        z-index: 10000;
-        width: 14px; // @font-size-base;
-        top: 0;
-
-
-        &.edge {
-          cursor: default;
-          display: none;
-        }
-
-        &:focus {
-          outline: none;
-        }
-
-        i {
-          position: absolute;
-          top: 50%;
-          margin-top: -.5*14px; //half of the @font-size-base
-        }
-      }
-
-      .left-arrow {
-        left: 0;
-      }
-
-      .right-arrow {
-        right: 0;
-      }
+    &--left {
+      left: 0;
     }
 
-    .tabber-content {
-      & > div {
-        display: none;
-        padding: 10px;
-      }
+    &--right {
+      right: 0;
+    }
+
+    i {
+      margin-top: -1 * 0.5 * $font-size-base;
+      position: absolute;
+      top: 50%;
     }
   }
 }

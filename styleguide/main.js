@@ -10,18 +10,21 @@ require.config({
 });
 
 requirejs(['template', 'tabber'], (template, Tabber) => {
-  // Fetch use cases data
+  // Fetch use cases data.
+  // This is polyfilled for old browsers via polyfill.io (see ./index.html)
   fetch('/model/usecases.json')
     .then(response => response.json())
     .then(data => {
-      // Populate the template and load the content on the html
+      // First hydrate the template with the use cases data.
       const container = document.getElementById('use-cases-container');
 
       container.innerHTML = template.usecases({
-        usecases: data.usecases
+        usecases: data
       });
 
-      // Initialize the agent for each of the use cases
-      document.querySelectorAll('.tabber').forEach(element => new Tabber(element, {}));
+      // Then initialise the agent for each of the use cases.
+      const instances = document.querySelectorAll('[data-tabber]');
+
+      instances.forEach(element => new Tabber(element, {}));
     });
 });

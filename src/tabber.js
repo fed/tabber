@@ -1,12 +1,26 @@
-define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
+define('tabber', ['lodash/debounce'], debounce => {
   const DEFAULTS = {
     arrowWidth: 14,
-    tabSlideSpeed: 250
+    tabSlideSpeed: 250,
+    leftArrowSelector: '.tabber__arrow--left',
+    rightArrowSelector: '.tabber__arrow--right',
+    navigationSelector: 'nav',
+    listSelector: 'ul',
+    tabsSelector: '.tabber__link',
+    selectedTabClassName: 'tabber__link--selected',
+    contentPanelsSelector: '[data-tabber-content]'
   };
 
   // Animation effects
-  const {show, hide} = animate;
+  function show(element, display) {
+    element.style.display = display || 'block';
+  }
 
+  function hide(element) {
+    element.style.display = 'none';
+  }
+
+  // Module definition
   function Tabber(element, options = {}) {
     // Settings
     this.settings = Object.assign({}, DEFAULTS, options);
@@ -15,12 +29,13 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
     this.animationInProgress = false;
 
     // Selectors
-    this.control = element.querySelector('.tabber-control');
-    this.tabsWrapper = this.control.querySelector('ul');
-    this.tabs = this.tabsWrapper.querySelectorAll('a');
-    this.leftArrow = this.control.querySelector('.left-arrow');
-    this.rightArrow = this.control.querySelector('.right-arrow');
-    this.content = element.querySelector('.tabber-content');
+    this.instance = element;
+    this.navigation = this.instance.querySelector(this.settings.navigationSelector);
+    this.list = this.navigation.querySelector(this.settings.listSelector);
+    this.tabs = this.list.querySelectorAll(this.settings.tabsSelector);
+    this.leftArrow = this.navigation.querySelector(this.settings.leftArrowSelector);
+    this.rightArrow = this.navigation.querySelector(this.settings.rightArrowSelector);
+    this.contentPanels = this.instance.querySelectorAll(this.settings.contentPanelsSelector);
 
     // Event Binding
     this.leftArrow.addEventListener('click', this.handleClickLeftArrow.bind(this));
@@ -40,11 +55,17 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
      */
 
     init() {
-      Array
-        .from(this.content.children)
-        .forEach(panel => this.hidePanel(panel));
-      this.showPanel(this.content.firstElementChild);
-      this.tabsWrapper.firstElementChild.classList.add('selected');
+      const firstTab = this.tabs[0];
+      const firstPanel = this.contentPanels[0];
+
+      // Start off hiding all panels but the first one
+      this.contentPanels.forEach(panel => this.hidePanel(panel));
+      this.showPanel(firstPanel);
+
+      // Start off with the first tab selected
+      firstTab.classList.add(this.settings.selectedTabClassName);
+
+      // Set up arrows and attach window.resize event handler
       this.updateControls();
       this.responsify();
     },
@@ -62,7 +83,10 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
      */
 
     getSelectedTab() {
-      return this.tabsWrapper.querySelector('li.selected');
+      return Array
+        .from(this.tabs)
+        .filter(tab => tab.classList.contains(this.settings.selectedTabClassName))
+        .reduce((acc, current) => current);
     },
 
     updateControls() {
@@ -87,22 +111,22 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
 
     isOffRightEdge(tab) {
       const tabRightEdge = tab.offsetLeft + tab.offsetWidth;
-      const containerRightEdge = this.control.offsetLeft + this.control.offsetWidth;
+      const containerRightEdge = this.instance.offsetLeft + this.instance.offsetWidth;
 
       return tabRightEdge > containerRightEdge;
     },
 
     isFirstTab(tab) {
-      return tab === this.tabsWrapper.firstElementChild;
+      return tab === this.tabs[0];
     },
 
     isLastTab(tab) {
-      return tab === this.tabsWrapper.lastElementChild;
+      return tab === this.tabs[this.tabs.length - 1];
     },
 
     getDistanceToRightEdge(tab) {
       const tabRightEdge = tab.offsetLeft + tab.offsetWidth;
-      const containerRightEdge = this.control.offsetWidth;
+      const containerRightEdge = this.instance.offsetWidth;
 
       if (this.isOffRightEdge(tab) && !this.isLastTab(tab)) {
         return Number.parseInt(containerRightEdge - tabRightEdge - this.settings.arrowWidth);
@@ -148,18 +172,21 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
      */
 
     hidePanel(panel) {
-      hide(panel); // fadeOut
+      hide(panel);
     },
 
     showPanel(panel) {
-      show(panel); // fadeIn
+      show(panel);
     },
 
     updateContent(tabId) {
-      const targetPanel = this.content.querySelector(`[data-content-id="${tabId}"]`);
+      const targetPanel = Array
+        .from(this.contentPanels)
+        .filter(panel => panel.dataset.tabberContent === tabId)
+        .reduce((acc, current) => current);
 
       // @TODO: probably don't hide all panels, only the hidden ones
-      Array.from(this.content.children).forEach(panel => this.hidePanel(panel));
+      this.contentPanels.forEach(panel => this.hidePanel(panel));
       this.showPanel(targetPanel);
     },
 
@@ -167,24 +194,28 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
      * ARROWS
      */
 
+    insertArrows() {
+
+    },
+
     enableLeftControl() {
       show(this.leftArrow, 'inline-block');
-      this.control.classList.remove('no-fade-left');
+      this.navigation.classList.remove('tabber--no-fade-left');
     },
 
     disableLeftControl() {
       hide(this.leftArrow);
-      this.control.classList.add('no-fade-left');
+      this.navigation.classList.add('tabber--no-fade-left');
     },
 
     enableRightControl() {
       show(this.rightArrow, 'inline-block');
-      this.control.classList.remove('no-fade-right');
+      this.navigation.classList.remove('tabber--no-fade-right');
     },
 
     disableRightControl() {
       hide(this.rightArrow);
-      this.control.classList.add('no-fade-right');
+      this.navigation.classList.add('tabber--no-fade-right');
     },
 
     handleClickLeftArrow(event) {
@@ -221,15 +252,15 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       event.stopPropagation();
 
       const tab = event.target;
-      const tabId = tab.dataset.tabId;
-      const alreadySelected = tabId === this.getSelectedTab().firstElementChild.dataset.tabId;
+      const tabId = tab.dataset.tabberTab;
+      const alreadySelected = tab === this.getSelectedTab();
 
       if (alreadySelected) {
         return;
       }
 
-      this.getSelectedTab().classList.remove('selected');
-      tab.parentNode.classList.add('selected');
+      this.getSelectedTab().classList.remove(this.settings.selectedTabClassName);
+      tab.classList.add(this.settings.selectedTabClassName);
       this.updateContent(tabId);
 
       // Bring partially visible tabs into screen when clicked
@@ -247,7 +278,7 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
     animateScrolling(direction, length) {
       this.animationInProgress = true;
 
-      const currentMargin = Number.parseInt(getComputedStyle(this.tabsWrapper)['margin-left']);
+      const currentMargin = Number.parseInt(getComputedStyle(this.list)['margin-left']);
       let nextMargin;
 
       switch (direction) {
@@ -266,7 +297,7 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
       const options = {
         duration: this.settings.tabSlideSpeed
       };
-      const animation = this.tabsWrapper.animate(keyframes, options);
+      const animation = this.list.animate(keyframes, options);
 
       animation.onfinish = () => {
         this.animationInProgress = false;
@@ -274,7 +305,7 @@ define('tabber', ['lodash/debounce', 'animate'], (debounce, animate) => {
         // @TODO: don't wanna need to do this
         // but marginLeft is going back to its original state once
         // the animation is over. Not sure why though.
-        this.tabsWrapper.style.marginLeft = `${nextMargin}px`;
+        this.list.style.marginLeft = `${nextMargin}px`;
 
         this.updateControls();
       };
